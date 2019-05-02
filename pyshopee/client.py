@@ -4,7 +4,7 @@ import json
 import time
 
 import backoff
-from requests import Request, Session, exceptions
+from requests import Request, Session, exceptions, ReadTimeout
 
 from .discount import Discount
 from .image import Image
@@ -128,7 +128,7 @@ class Client(object, metaclass=ClientMeta):
             self.CACHED_MODULE.setdefault(key, CACHED_MODULE)
         return CACHED_MODULE
 
-    @backoff.on_exception(backoff.fibo, exceptions.Timeout, max_tries=3)
+    @backoff.on_exception(backoff.fibo, (exceptions.Timeout, ReadTimeout), max_tries=3)
     def execute(self, uri, method, body=None):
         ''' defalut timeout value will be 10 seconds
         '''
