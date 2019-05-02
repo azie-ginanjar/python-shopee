@@ -1,19 +1,21 @@
-import os
-import time
+import hashlib
+import hmac
 import json
-import hmac, hashlib
+import time
+
+import backoff
 from requests import Request, Session, exceptions
+
+from .discount import Discount
+from .image import Image
+from .item import Item
+from .logistic import Logistic
+from .order import Order
+from .public import Public
+from .rma import RMA
 from .shop import Shop
 from .shopcategory import ShopCategory
-from .item import Item
-from .image import Image
-from .discount import Discount
-from .order import Order
-from .logistic import Logistic
-from .rma import RMA
-from .public import Public
 from .toppicks import Toppicks
-
 
 # installed sub-module
 registered_module = {
@@ -126,7 +128,7 @@ class Client(object, metaclass=ClientMeta):
             self.CACHED_MODULE.setdefault(key, CACHED_MODULE)
         return CACHED_MODULE
 
-
+    @backoff.on_exception(backoff.fibo, exceptions.Timeout, max_tries=3)
     def execute(self, uri, method, body=None):
         ''' defalut timeout value will be 10 seconds
         '''

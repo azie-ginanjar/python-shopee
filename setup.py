@@ -40,6 +40,10 @@ setup(
     url = URL,
     license = LICENSE,
     packages = find_packages(),
+    install_requires=[
+        'backoff',
+        'requests'
+    ],
     include_package_data=True,
     zip_safe=True,
 )
